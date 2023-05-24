@@ -14,20 +14,21 @@ struct Args {
     msg: Option<String>,
 }
 
-fn get_sequence(cmd: String, msg: Option<String>) -> Result<Vec<&'static str>, &'static str> {
+fn get_sequence(cmd: String, msg: Option<String>) -> Result<Vec<String>, &'static str> {
     match cmd.as_str() {
         "update" => {
             if let Some(message) = msg {
+                //TODO: macro to make this conciser? https://play.rust-lang.org/?version=stable&mode=debug&edition=2015&gist=bfb5144953af92f8ff8a2ec9b5861c93
                 Ok(vec![
-                    "git add .",
-                    format!("git commit -m \"{}\"", message).as_str(),
-                    "git push origin master",
+                    String::from("git add ."),
+                    format!("git commit -m \"{}\"", message),
+                    String::from("git push origin master"),
                 ])
             } else {
                 Ok(vec![
-                    "git add .",
-                    "git commit -m \"\"",
-                    "git push origin master",
+                    String::from("git add ."),
+                    String::from("git commit -m \"\""),
+                    String::from("git push origin master"),
                 ])
             }
         }
@@ -38,15 +39,17 @@ fn main() {
     let args = Args::parse();
     let sequence = get_sequence(args.cmd, args.msg).unwrap();
     //TODO: iterate through sequence and run each command (below code) each time
-    let output = Command::new("powershell")
-        .arg("-Command")
-        .arg(sequence)
-        .output()
-        .expect("Failed to execute command");
+    for cmd in sequence.iter() {
+        let output = Command::new("powershell")
+            .arg("-Command")
+            .arg(cmd)
+            .output()
+            .expect("Failed to execute command");
 
-    if output.status.success() {
-        io::stdout().write_all(&output.stdout).unwrap();
-    } else {
-        io::stdout().write_all(&output.stdout).unwrap();
+        if output.status.success() {
+            io::stdout().write_all(&output.stdout).unwrap();
+        } else {
+            io::stdout().write_all(&output.stdout).unwrap();
+        }
     }
 }
