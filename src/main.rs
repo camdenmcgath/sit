@@ -3,8 +3,9 @@ use std::io::{self, Write};
 use std::process::Command;
 use std::vec;
 
-//TODO: GOAL: get basic functionality (git add . , commit, push)
+//TODO: GOAL: addd more combos
 //TODO: NEXT: organize (module for each combo), add support for other os/shells, pretty print
+//CONSIDER: anyhow for errors, indicatif for printing progress
 #[derive(Parser, Debug)]
 struct Args {
     ///Spit command name mapping to a combo of git commands
