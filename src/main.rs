@@ -1,9 +1,10 @@
 use clap::Parser;
+use indicatif::ProgressBar;
 use std::io::{self, Write};
 use std::process::Command;
 use std::vec;
 
-//TODO: GOAL: addd more combos
+//TODO: GOAL: add more combos, logging, tests, publish
 //TODO: NEXT: organize (module for each combo), add support for other os/shells, pretty print
 //CONSIDER: anyhow for errors, indicatif for printing progress
 #[derive(Parser, Debug)]
@@ -28,7 +29,7 @@ fn get_sequence(cmd: String, msg: Option<String>) -> Result<Vec<String>, &'stati
             } else {
                 Ok(vec![
                     String::from("git add ."),
-                    String::from("git commit -m \"\""),
+                    String::from("git commit -m \" \""),
                     String::from("git push origin master"),
                 ])
             }
@@ -39,7 +40,7 @@ fn get_sequence(cmd: String, msg: Option<String>) -> Result<Vec<String>, &'stati
 fn main() {
     let args = Args::parse();
     let sequence = get_sequence(args.cmd, args.msg).unwrap();
-    //TODO: iterate through sequence and run each command (below code) each time
+    let prog_bar = ProgressBar::new(sequence.len() as u64);
     for cmd in sequence.iter() {
         let output = Command::new("powershell")
             .arg("-Command")
@@ -48,9 +49,14 @@ fn main() {
             .expect("Failed to execute command");
 
         if output.status.success() {
+            //prog_bar.inc(1);
             io::stdout().write_all(&output.stdout).unwrap();
         } else {
+            //prog_bar.finish();
+            print!("testing else");
             io::stdout().write_all(&output.stdout).unwrap();
         }
     }
+    print!("testing msg");
+    //prog_bar.finish_with_message("Done");
 }
