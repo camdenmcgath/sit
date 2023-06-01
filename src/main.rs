@@ -50,14 +50,11 @@ fn main() {
             .expect("Failed to execute command");
 
         if output.status.success() {
-            //prog_bar.inc(1);
+            prog_bar.inc(1);
             io::stdout().write_all(&output.stdout).unwrap();
         } else {
-            //prog_bar.finish();
-            print!("testing else");
             io::stdout().write_all(&output.stdout).unwrap();
         }
     }
-    print!("testing msg");
     prog_bar.finish_with_message("Done");
 }
