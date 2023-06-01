@@ -41,7 +41,7 @@ fn main() {
     let args = Args::parse();
     let sequence = get_sequence(args.cmd, args.msg).unwrap();
     let prog_bar = ProgressBar::new(sequence.len() as u64)
-        .with_style(ProgressStyle::with_template("{bar:50}{msg}").unwrap());
+        .with_style(ProgressStyle::with_template("{bar}{msg}").unwrap());
     for cmd in sequence.iter() {
         let output = Command::new("powershell")
             .arg("-Command")
@@ -56,5 +56,5 @@ fn main() {
             io::stdout().write_all(&output.stdout).unwrap();
         }
     }
-    prog_bar.finish_with_message("Done");
+    prog_bar.finish_with_message("\nDone");
 }
