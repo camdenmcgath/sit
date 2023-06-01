@@ -1,5 +1,5 @@
 use clap::Parser;
-use indicatif::ProgressBar;
+use indicatif::{ProgressBar, ProgressStyle};
 use std::io::{self, Write};
 use std::process::Command;
 use std::vec;
@@ -40,7 +40,8 @@ fn get_sequence(cmd: String, msg: Option<String>) -> Result<Vec<String>, &'stati
 fn main() {
     let args = Args::parse();
     let sequence = get_sequence(args.cmd, args.msg).unwrap();
-    let prog_bar = ProgressBar::new(sequence.len() as u64);
+    let prog_bar = ProgressBar::new(sequence.len() as u64)
+        .with_style(ProgressStyle::with_template("{msg}").unwrap());
     for cmd in sequence.iter() {
         let output = Command::new("powershell")
             .arg("-Command")
