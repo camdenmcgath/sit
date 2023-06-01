@@ -58,5 +58,5 @@ fn main() {
         }
     }
     print!("testing msg");
-    //prog_bar.finish_with_message("Done");
+    prog_bar.finish_with_message("Done");
 }
