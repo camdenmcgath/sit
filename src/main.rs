@@ -5,8 +5,8 @@ use std::process::Command;
 use std::vec;
 
 //TODO: GOAL: add more combos, logging, tests, publish
-//TODO: NEXT: organize (module for each combo), add support for other os/shells, pretty print
-//CONSIDER: anyhow for errors, indicatif for printing progress
+//TODO: NEXT: organize (module for each combo), add support for other os/shells, refine pretty print
+//CONSIDER: anyhow for errors
 #[derive(Parser, Debug)]
 struct Args {
     ///Spit command name mapping to a combo of git commands
@@ -14,9 +14,16 @@ struct Args {
 
     /// message to be passed to -m in git command
     msg: Option<String>,
+
+    /// optional url command
+    url: Option<String>,
 }
 
-fn get_sequence(cmd: String, msg: Option<String>) -> Result<Vec<String>, &'static str> {
+fn get_sequence(
+    cmd: String,
+    msg: Option<String>,
+    url: Option<String>,
+) -> Result<Vec<String>, &'static str> {
     match cmd.as_str() {
         "update" => {
             if let Some(message) = msg {
@@ -34,14 +41,37 @@ fn get_sequence(cmd: String, msg: Option<String>) -> Result<Vec<String>, &'stati
                 ])
             }
         }
+        "add-empty" => {
+            if let Some(web_addr) = url {
+                if let Some(message) = msg {
+                    Ok(vec![
+                        String::from("git init"),
+                        format!("git remote add origin \"{}\"", web_addr),
+                        String::from("git add ."),
+                        format!("git commit -m \"{}\"", message),
+                        String::from("git push -u origin main"),
+                    ])
+                } else {
+                    Ok(vec![
+                        String::from("git init"),
+                        format!("git remove add origin \"{}\"", web_addr),
+                        String::from("git add ."),
+                        format!("git commit -m \" \""),
+                        String::from("git push -u origin main"),
+                    ])
+                }
+            } else {
+                Err("add-empty requires a url parameter.")
+            }
+        }
         _ => Err("Unknown command."),
     }
 }
 fn main() {
     let args = Args::parse();
-    let sequence = get_sequence(args.cmd, args.msg).unwrap();
-    let prog_bar = ProgressBar::new(sequence.len() as u64)
-        .with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
+    let sequence = get_sequence(args.cmd, args.msg, args.url).unwrap();
+    //let prog_bar = ProgressBar::new(sequence.len() as u64)
+    //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
     for cmd in sequence.iter() {
         let output = Command::new("powershell")
             .arg("-Command")
@@ -50,11 +80,14 @@ fn main() {
             .expect("Failed to execute command");
 
         if output.status.success() {
-            prog_bar.inc(1);
+            //prog_bar.inc(1);
             io::stdout().write_all(&output.stdout).unwrap();
         } else {
             io::stdout().write_all(&output.stdout).unwrap();
         }
+
+        io::stdout().flush().unwrap();
     }
-    prog_bar.finish_with_message("\nDone");
+    //prog_bar.finish_with_message("Done");
+    print!("Finished successfuly!");
 }

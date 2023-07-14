@@ -2,6 +2,14 @@
 name = "spit"
 version = "0.1.0"
 edition = "2021"
+authors = ["Camden McGath cmcgath@nnu.edu"]
+license = "MIT"
+description = "Spit (Speedy Git) is a CLI tool to automate common git command combinations"
+readme = "README.md"
+homepage = "https://github.com/camdenmcgath/speedy-git"
+repository = "https://github.com/camdenmcgath/speedy-git"
+keywords = ["cli", "git", "automation"]
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
