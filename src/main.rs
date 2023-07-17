@@ -1,4 +1,8 @@
+mod cli;
+mod commands;
 use clap::Parser;
+use cli::parser::Args;
+use commands::combos::*;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::io::{self, Write};
 use std::process::Command;
@@ -7,72 +11,20 @@ use std::vec;
 //TODO: GOAL: add more combos, logging, tests, publish
 //TODO: NEXT: organize (module for each combo), add support for other os/shells, refine pretty print
 //CONSIDER: anyhow for errors
-#[derive(Parser, Debug)]
-struct Args {
-    ///Spit command name mapping to a combo of git commands
-    cmd: String,
 
-    /// message to be passed to -m in git command
-    msg: Option<String>,
-
-    /// optional url command
-    url: Option<String>,
-}
-
-fn get_sequence(
-    cmd: String,
-    msg: Option<String>,
-    url: Option<String>,
-) -> Result<Vec<String>, &'static str> {
-    match cmd.as_str() {
-        "update" => {
-            if let Some(message) = msg {
-                //TODO: macro to make this conciser? https://play.rust-lang.org/?version=stable&mode=debug&edition=2015&gist=bfb5144953af92f8ff8a2ec9b5861c93
-                Ok(vec![
-                    String::from("git add ."),
-                    format!("git commit -m \"{}\"", message),
-                    String::from("git push origin master"),
-                ])
-            } else {
-                Ok(vec![
-                    String::from("git add ."),
-                    String::from("git commit -m \" \""),
-                    String::from("git push origin master"),
-                ])
-            }
-        }
-        "add-empty" => {
-            if let Some(web_addr) = url {
-                if let Some(message) = msg {
-                    Ok(vec![
-                        String::from("git init"),
-                        format!("git remote add origin \"{}\"", web_addr),
-                        String::from("git add ."),
-                        format!("git commit -m \"{}\"", message),
-                        String::from("git push -u origin main"),
-                    ])
-                } else {
-                    Ok(vec![
-                        String::from("git init"),
-                        format!("git remove add origin \"{}\"", web_addr),
-                        String::from("git add ."),
-                        format!("git commit -m \" \""),
-                        String::from("git push -u origin main"),
-                    ])
-                }
-            } else {
-                Err("add-empty requires a url parameter.")
-            }
-        }
-        _ => Err("Unknown command."),
-    }
-}
 fn main() {
     let args = Args::parse();
-    let sequence = get_sequence(args.cmd, args.msg, args.url).unwrap();
+    let combo= match args.cmd.as_str() {
+        "commit" => Combos::Commit(Commit::build(args)),
+        "push" => Combos::Push(Push::build(args)),
+        "update" => Combos::Update(Update::build(args)),
+        _ => panic!("Invalid command"),
+    }
     //let prog_bar = ProgressBar::new(sequence.len() as u64)
     //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
-    for cmd in sequence.iter() {
+    for cmd in combo.cmds.iter() {
+        println!("\nRunning {}", cmd);
+        println!("-----------------------------------------------");
         let output = Command::new("powershell")
             .arg("-Command")
             .arg(cmd)
@@ -82,12 +34,13 @@ fn main() {
         if output.status.success() {
             //prog_bar.inc(1);
             io::stdout().write_all(&output.stdout).unwrap();
+            io::stderr().write_all(&output.stderr).unwrap();
         } else {
             io::stdout().write_all(&output.stdout).unwrap();
+            io::stderr().write_all(&output.stderr).unwrap();
         }
-
         io::stdout().flush().unwrap();
     }
     //prog_bar.finish_with_message("Done");
-    print!("Finished successfuly!");
+    print!("\nFinished successfuly!");
 }
