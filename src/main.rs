@@ -22,12 +22,7 @@ pub struct Args {
 
 fn main() {
     let args = Args::parse();
-    let combo = match args.cmd.as_str() {
-        "commit" => commit(args),
-        "push" => push(args),
-        "update" => update(args),
-        _ => panic!("Invalid command"),
-    };
+    let combo = get_combo(args);
     //let prog_bar = ProgressBar::new(sequence.len() as u64)
     //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
     for cmd in combo {
