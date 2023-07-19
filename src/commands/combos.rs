@@ -1,5 +1,5 @@
 use crate::Args;
-
+use std::process::Command;
 pub fn commit(args: Args) -> Vec<String> {
     vec![
         "git add .".to_string(),
@@ -11,7 +11,8 @@ pub fn commit(args: Args) -> Vec<String> {
 }
 
 pub fn push() -> Vec<String> {
-    vec!["git push origin master".to_string()]
+    let branch = current_branch();
+    vec![format!("git push --set-upstream origin {}", branch)]
 }
 
 pub fn update(args: Args) -> Vec<String> {
@@ -32,4 +33,14 @@ pub fn get_combo(args: Args) -> Vec<String> {
         "update" => return update(args),
         _ => panic!("Invalid command"),
     };
+}
+
+pub fn current_branch() -> String {
+    let output = Command::new("powershell")
+        .arg("-Command")
+        .arg("git rev-parse --abbrev-ref HEAD")
+        .output()
+        .expect("Failed to execute command");
+
+    String::from_utf8_lossy(&output.stderr).as_ref().to_owned()
 }
