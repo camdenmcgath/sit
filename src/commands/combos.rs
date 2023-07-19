@@ -3,10 +3,10 @@ use std::process::Command;
 
 pub fn commit(args: Args) -> Vec<String> {
     vec![
-        "git add .".to_string(),
+        String::from("git add ."),
         format!(
             "git commit --message=\"{}\"",
-            args.msg.unwrap_or("update".to_string())
+            args.msg.unwrap_or(String::from("update"))
         ),
     ]
 }
@@ -23,8 +23,15 @@ pub fn update(args: Args) -> Vec<String> {
         .collect()
 }
 
-pub fn add(args: &Args) -> Vec<String> {
-    Vec::new()
+pub fn make(args: Args) -> Vec<String> {
+    vec![
+        String::from("git init"),
+        format!(
+            "git remote add origin {}",
+            args.url
+                .unwrap_or(String::from("url must be provided to add remote"))
+        ),
+    ]
 }
 
 pub fn get_combo(args: Args) -> Vec<String> {
@@ -32,6 +39,13 @@ pub fn get_combo(args: Args) -> Vec<String> {
         "commit" => return commit(args),
         "push" => return push(),
         "update" => return update(args),
+        "make" => {
+            if !in_working_tree() {
+                return make(args);
+            } else {
+                panic!("Already in a working tree!")
+            }
+        }
         _ => panic!("Invalid command"),
     };
 }
@@ -47,4 +61,18 @@ pub fn current_branch() -> String {
         .as_ref()
         .trim()
         .to_owned()
+}
+
+fn in_working_tree() -> bool {
+    let output = Command::new("powershell")
+        .arg("Command")
+        .arg("git rev-parse --is-inside-work-tree")
+        .output()
+        .expect("Failed to execute command");
+
+    if String::from_utf8_lossy(&output.stdout).as_ref().trim() == "true" {
+        true
+    } else {
+        false
+    }
 }
