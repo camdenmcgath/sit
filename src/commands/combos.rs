@@ -1,5 +1,6 @@
 use crate::Args;
 use std::process::Command;
+
 pub fn commit(args: Args) -> Vec<String> {
     vec![
         "git add .".to_string(),
@@ -38,9 +39,12 @@ pub fn get_combo(args: Args) -> Vec<String> {
 pub fn current_branch() -> String {
     let output = Command::new("powershell")
         .arg("-Command")
-        .arg("git rev-parse --abbrev-ref HEAD")
+        .arg("git branch --show-current")
         .output()
         .expect("Failed to execute command");
 
-    String::from_utf8_lossy(&output.stderr).as_ref().to_owned()
+    String::from_utf8_lossy(&output.stdout)
+        .as_ref()
+        .trim()
+        .to_owned()
 }
