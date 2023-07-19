@@ -1,28 +1,36 @@
-mod cli;
 mod commands;
 use clap::Parser;
-use cli::parser::Args;
 use commands::combos::*;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::io::{self, Write};
 use std::process::Command;
-use std::vec;
-
 //TODO: GOAL: add more combos, logging, tests, publish
 //TODO: NEXT: organize (module for each combo), add support for other os/shells, refine pretty print
 //CONSIDER: anyhow for errors
 
+#[derive(Parser, Debug, Clone)]
+pub struct Args {
+    ///Spit command name mapping to a combo of git commands
+    pub cmd: String,
+
+    /// message to be passed to -m in git command
+    pub msg: Option<String>,
+
+    /// optional url command
+    pub url: Option<String>,
+}
+
 fn main() {
     let args = Args::parse();
-    let combo= match args.cmd.as_str() {
-        "commit" => Combos::Commit(Commit::build(args)),
-        "push" => Combos::Push(Push::build(args)),
-        "update" => Combos::Update(Update::build(args)),
+    let combo = match args.cmd.as_str() {
+        "commit" => commit(args),
+        "push" => push(args),
+        "update" => update(args),
         _ => panic!("Invalid command"),
-    }
+    };
     //let prog_bar = ProgressBar::new(sequence.len() as u64)
     //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
-    for cmd in combo.cmds.iter() {
+    for cmd in combo {
         println!("\nRunning {}", cmd);
         println!("-----------------------------------------------");
         let output = Command::new("powershell")

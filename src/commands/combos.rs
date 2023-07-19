@@ -1,48 +1,26 @@
-use crate::cli::parser::Args;
-use enum_dispatch::enum_dispatch;
+use crate::Args;
 
-pub trait Combo {
-    fn build(args: Args) -> Vec<String>;
+pub fn commit(args: Args) -> Vec<String> {
+    vec![
+        "git add .".to_string(),
+        format!(
+            "git commit -m {}",
+            args.msg.unwrap_or("defualt".to_string())
+        ),
+    ]
 }
 
-pub struct Commit {
-    cmds: Vec<String>,
+pub fn push(args: Args) -> Vec<String> {
+    vec!["git push origin master".to_string()]
 }
 
-impl Combo for Commit {
-    fn build(args: Args) -> Vec<String> {
-        vec![
-            "git add .".to_string(),
-            format!("commit -m {}", args.msg.unwrap_or_default()),
-        ]
-    }
+pub fn update(args: Args) -> Vec<String> {
+    vec![commit(args.clone()), push(args.clone())]
+        .into_iter()
+        .flatten()
+        .collect()
 }
 
-pub struct Push {
-    cmds: Vec<String>,
-}
-
-impl Combo for Push {
-    fn build(args: Args) -> Vec<String> {
-        vec!["git push origin master".to_string()]
-    }
-}
-
-pub struct Update {
-    cmds: Vec<String>,
-}
-
-impl Combo for Update {
-    fn build(args: Args) -> Vec<String> {
-        Vec::new() // add vector to pipe things wtih
-    }
-}
-pub struct AddEmpty {
-    cmds: Vec<String>,
-}
-
-impl Combo for AddEmpty {
-    fn build(args: Args) -> Vec<String> {
-        Vec::new()
-    }
+pub fn add(args: &Args) -> Vec<String> {
+    Vec::new()
 }
