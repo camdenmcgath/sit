@@ -21,6 +21,7 @@ pub struct Args {
     pub url: Option<String>,
 }
 
+pub enum Error {}
 fn main() {
     let args = Args::parse();
     let combo = get_combo(args);

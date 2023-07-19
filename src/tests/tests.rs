@@ -5,8 +5,8 @@ use crate::commands::combos::*;
 use crate::Args;
 
 fn combo_test(args: Args, expected: Vec<String>) {
-    let matched = get_combo(args.clone());
-    let combo = get_combo(args.clone());
+    let matched = get_combo(args.clone())?;
+    let combo = get_combo(args.clone())?;
     assert_eq!(
         matched, combo,
         "get_combo function failed to match {}",
@@ -19,6 +19,10 @@ fn combo_test(args: Args, expected: Vec<String>) {
     );
 }
 
+#[test]
+fn check_working_tree() {
+    assert!(in_working_tree(), "Got {}", in_working_tree());
+}
 #[test]
 fn check_current_branch() {
     assert_eq!(current_branch(), "master")
