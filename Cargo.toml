@@ -2,7 +2,7 @@
 name = "spit"
 version = "0.1.0"
 edition = "2021"
-authors = ["Camden McGath"]
+authors = ["Camden McGath cmcgath@nnu.edu"]
 license = "MIT"
 description = "Spit (Speedy Git) is a CLI tool to automate common git workflows and provide safer defaults"
 readme = "README.md"
