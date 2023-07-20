@@ -22,7 +22,7 @@ pub struct Args {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum Error {
+pub enum GitError {
     #[error("Invalid command {0}")]
     InvalidCommand(String),
     #[error("In working tree, repo already initialized.")]
@@ -35,19 +35,22 @@ pub enum Error {
     NoURL(String),
 }
 
-fn main() -> anyhow::Result<()> {
+fn main() -> Result<(), anyhow::Error> {
     let args = Args::parse();
     let combo = get_combo(args)?;
     //let prog_bar = ProgressBar::new(sequence.len() as u64)
     //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
     for cmd in combo {
+        if !in_working_tree() {
+            return Err(GitError::NotARepo.into());
+        }
         println!("\nRunning {}", cmd);
         println!("-----------------------------------------------");
         let output = Command::new("powershell")
             .arg("-Command")
-            .arg(cmd)
+            .arg(cmd.clone())
             .output()
-            .expect("Failed to execute command");
+            .expect(format!("Failed to execute command {}", cmd).as_str());
 
         if output.status.success() {
             //prog_bar.inc(1);

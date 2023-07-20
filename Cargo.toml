@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Camden McGath cmcgath@nnu.edu"]
 license = "MIT"
-description = "Speedy Git (spit) is a CLI tool to automate common git workflows and provide safer defaults"
+description = "Simple Git (sit) is a CLI tool to automate common git workflows and provide safer defaults"
 readme = "README.md"
 homepage = "https://github.com/camdenmcgath/speedy-git"
 repository = "https://github.com/camdenmcgath/speedy-git"
@@ -18,3 +18,4 @@ clap = { version = "4.2.7", features = ["derive"] }
 indicatif = "0.17.4"
 thiserror = "1.0"
 anyhow = "1.0"
+
