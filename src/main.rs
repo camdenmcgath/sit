@@ -4,7 +4,7 @@ use clap::Parser;
 use commands::combos::*;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::io::{self, Write};
-use std::process::Command;
+use std::process::{Command, Termination};
 //TODO: GOAL: add more combos, logging, tests, publish
 //TODO: NEXT: organize (module for each combo), add support for other os/shells, refine pretty print
 //CONSIDER: anyhow for errors
@@ -21,10 +21,23 @@ pub struct Args {
     pub url: Option<String>,
 }
 
-pub enum Error {}
-fn main() {
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+    #[error("Invalid command {0}")]
+    InvalidCommand(String),
+    #[error("In working tree, repo already initialized.")]
+    AlreadyInit,
+    #[error("Not in a working tree, current directory not a github repo.")]
+    NotARepo,
+    #[error("No message provided, but message is required for {0} command")]
+    NoMessage(String),
+    #[error("URL not provided but necessary for {0} command.")]
+    NoURL(String),
+}
+
+fn main() -> anyhow::Result<()> {
     let args = Args::parse();
-    let combo = get_combo(args);
+    let combo = get_combo(args)?;
     //let prog_bar = ProgressBar::new(sequence.len() as u64)
     //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
     for cmd in combo {
@@ -48,4 +61,5 @@ fn main() {
     }
     //prog_bar.finish_with_message("Done");
     print!("\nFinished successfuly!");
+    Ok(())
 }

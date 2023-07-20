@@ -1,12 +1,20 @@
 use std::fmt::format;
 use std::vec;
 
+use crate::Error;
+
 use crate::commands::combos::*;
 use crate::Args;
 
 fn combo_test(args: Args, expected: Vec<String>) {
-    let matched = get_combo(args.clone())?;
-    let combo = get_combo(args.clone())?;
+    let matched = get_combo(args.clone()).unwrap();
+    let combo = match args.cmd.as_str() {
+        "commit" => commit(args.clone()).unwrap(),
+        "push" => push().unwrap(),
+        "update" => update(args.clone()).unwrap(),
+        "make" => make(args.clone()).unwrap(),
+        _ => panic!("cmd not found"),
+    };
     assert_eq!(
         matched, combo,
         "get_combo function failed to match {}",
@@ -25,7 +33,7 @@ fn check_working_tree() {
 }
 #[test]
 fn check_current_branch() {
-    assert_eq!(current_branch(), "master")
+    assert_eq!(current_branch().unwrap(), "master")
 }
 
 #[test]
@@ -53,7 +61,7 @@ fn check_push() {
         },
         vec![format!(
             "git push --set-upstream origin {}",
-            current_branch()
+            current_branch().unwrap()
         )],
     );
 }
@@ -69,7 +77,10 @@ fn check_update() {
         vec![
             String::from("git add ."),
             String::from("git commit --message=\"testing\""),
-            format!("git push --set-upstream origin {}", current_branch()),
+            format!(
+                "git push --set-upstream origin {}",
+                current_branch().unwrap()
+            ),
         ],
     );
 }

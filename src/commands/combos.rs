@@ -1,69 +1,72 @@
 use crate::Args;
+use crate::Error;
 use std::process::Command;
 
-pub fn commit(args: Args) -> Result<Vec<String>, &'static str> {
-    vec![
-        String::from("git add ."),
-        format!(
-            "git commit --message=\"{}\"",
-            args.msg.unwrap_or(String::from("update"))
-        ),
-    ]
+pub fn commit(args: Args) -> Result<Vec<String>, Error> {
+    if let Some(msg) = args.msg {
+        Ok(vec![
+            String::from("git add ."),
+            format!("git commit --message=\"{}\"", msg),
+        ])
+    } else {
+        Err(Error::NoMessage(String::from("commit")))
+    }
 }
 
-pub fn push() -> Result<Vec<String>, &'static str> {
-    let branch = current_branch();
-    vec![format!("git push --set-upstream origin {}", branch)]
+pub fn push() -> Result<Vec<String>, Error> {
+    let branch = current_branch()?;
+    Ok(vec![format!("git push --set-upstream origin {}", branch)])
 }
 
-pub fn update(args: Args) -> Result<Vec<String>, &'static str> {
-    vec![commit(args.clone()), push()]
+pub fn update(args: Args) -> Result<Vec<String>, Error> {
+    Ok(vec![commit(args.clone())?, push()?]
         .into_iter()
         .flatten()
-        .collect()
+        .collect())
 }
 
-pub fn make(args: Args) -> Result<Vec<String>, &'static str> {
-    vec![
-        String::from("git init"),
-        format!(
-            "git remote add origin {}",
-            args.url
-                .unwrap_or(String::from("url must be provided to add remote"))
-        ),
-    ]
+pub fn make(args: Args) -> Result<Vec<String>, Error> {
+    if let Some(addr) = args.url {
+        Ok(vec![
+            String::from("git init"),
+            format!("git remote add origin {}", addr),
+        ])
+    } else {
+        Err(Error::NoURL(String::from("make")))
+    }
 }
 
-pub fn get_combo(args: Args) -> Result<Vec<String>, &'static str> {
+pub fn get_combo(args: Args) -> Result<Vec<String>, Error> {
     match args.cmd.as_str() {
-        "commit" => return commit(args),
-        "push" => return push(),
-        "update" => return update(args),
+        "commit" => Ok(commit(args)?),
+        "push" => Ok(push()?),
+        "update" => Ok(update(args)?),
         "make" => {
             if !in_working_tree() {
-                return make(args);
+                Ok(make(args)?)
             } else {
-                panic!("Already in a working tree!")
+                Err(Error::AlreadyInit)
             }
         }
-        _ => panic!("Invalid command"),
-    };
+        _ => Err(Error::InvalidCommand(args.cmd)),
+    }
 }
 
-pub fn current_branch() -> Result<String, &'static str> {
+pub fn current_branch() -> Result<String, Error> {
     if !in_working_tree() {
-        Err("Not currently in a git repo or working tree.")
-    }
-    let output = Command::new("powershell")
-        .arg("-Command")
-        .arg("git branch --show-current")
-        .output()
-        .expect("Failed to execute command");
+        Err(Error::NotARepo)
+    } else {
+        let output = Command::new("powershell")
+            .arg("-Command")
+            .arg("git branch --show-current")
+            .output()
+            .expect("Failed to execute command");
 
-    Ok(String::from_utf8_lossy(&output.stdout)
-        .as_ref()
-        .trim()
-        .to_owned())
+        Ok(String::from_utf8_lossy(&output.stdout)
+            .as_ref()
+            .trim()
+            .to_owned())
+    }
 }
 
 pub fn in_working_tree() -> bool {

@@ -16,3 +16,5 @@ categories = ["command-line-utilities"]
 [dependencies]
 clap = { version = "4.2.7", features = ["derive"] }
 indicatif = "0.17.4"
+thiserror = "1.0"
+anyhow = "1.0"
