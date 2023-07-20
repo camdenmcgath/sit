@@ -75,10 +75,6 @@ pub fn in_working_tree() -> bool {
         .arg("git rev-parse --is-inside-work-tree")
         .output()
         .expect("Failed to execute command");
-    print!(
-        "{}",
-        String::from_utf8_lossy(&output.stdout).as_ref().trim()
-    );
     if String::from_utf8_lossy(&output.stdout).as_ref().trim() == "true" {
         true
     } else {
