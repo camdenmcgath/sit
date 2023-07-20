@@ -38,3 +38,5 @@ These are some features and ideas that make up the vision of where sit could eve
   - [ ] MacOS
   - [ ] Linux
 - [ ] More sit command combos !!
+- [ ] More tests
+- [ ] Logging
