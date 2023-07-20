@@ -5,9 +5,9 @@ use commands::combos::*;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::io::{self, Write};
 use std::process::{Command, Termination};
-//TODO: GOAL: add more combos, logging, tests, publish
-//TODO: NEXT: organize (module for each combo), add support for other os/shells, refine pretty print
-//CONSIDER: anyhow for errors
+//TODO: GOAL: add more combos, logging, tests,
+//TODO: NEXT: add support for other os/shells, refine pretty print
+//TODO: add CI between github and crates, deploy downloadable binaries
 
 #[derive(Parser, Debug, Clone)]
 pub struct Args {
