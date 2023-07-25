@@ -4,7 +4,7 @@ version = "0.1.1"
 edition = "2021"
 authors = ["Camden McGath cmcgath@nnu.edu"]
 license = "MIT"
-description = "Speedy Git (spit) is a CLI tool to automate common git workflows and provide safer defaults"
+description = "Speedy Git is a CLI tool to automate common git workflows and provide safer defaults"
 readme = "README.md"
 homepage = "https://github.com/camdenmcgath/speedy-git"
 repository = "https://github.com/camdenmcgath/speedy-git"
@@ -22,5 +22,5 @@ anyhow = "1.0"
 [[bin]]
 bench = false
 path = "crates/core/main.rs"
-name = "spit"
+name = "sg"
 
