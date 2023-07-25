@@ -275,8 +275,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "sit"
-version = "0.1.0"
+name = "speedy-git"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "clap",
