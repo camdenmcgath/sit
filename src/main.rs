@@ -46,11 +46,11 @@ fn main() -> Result<(), anyhow::Error> {
         }
         println!("\nRunning {}", cmd);
         println!("-----------------------------------------------");
-        let output = Command::new("powershell")
+        let output = Command::new("pwsh")
             .arg("-Command")
             .arg(cmd.clone())
             .output()
-            .expect(format!("Failed to execute command {}", cmd).as_str());
+            .expect(format!("Failed to execute command in main {}", cmd).as_str());
 
         if output.status.success() {
             //prog_bar.inc(1);

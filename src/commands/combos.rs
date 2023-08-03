@@ -60,7 +60,7 @@ pub fn current_branch() -> Result<String, GitError> {
             .arg("-Command")
             .arg("git branch --show-current")
             .output()
-            .expect("Failed to execute command");
+            .expect("Failed to execute command in current_branch()");
 
         Ok(String::from_utf8_lossy(&output.stdout)
             .as_ref()
@@ -70,11 +70,11 @@ pub fn current_branch() -> Result<String, GitError> {
 }
 
 pub fn in_working_tree() -> bool {
-    let output = Command::new("powershell")
+    let output = Command::new("pwsh")
         .arg("-Command")
         .arg("git rev-parse --is-inside-work-tree")
         .output()
-        .expect("Failed to execute command");
+        .expect("Failed to execute command in in_working_tree()");
     if String::from_utf8_lossy(&output.stdout).as_ref().trim() == "true" {
         true
     } else {
