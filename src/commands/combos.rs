@@ -56,7 +56,7 @@ pub fn current_branch() -> Result<String, GitError> {
     if !in_working_tree() {
         Err(GitError::NotARepo)
     } else {
-        let output = Command::new("powershell")
+        let output = Command::new("pwsh")
             .arg("-Command")
             .arg("git branch --show-current")
             .output()
