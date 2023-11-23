@@ -45,3 +45,4 @@ These are some features and ideas that make up the vision of where sit could eve
 - [ ] More sit command combos !!
 - [ ] More tests
 - [ ] Logging
+- [ ] Faster/more efficient
