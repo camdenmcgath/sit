@@ -1,6 +1,5 @@
 mod commands;
 mod tests;
-mod runner;
 use clap::Parser;
 use commands::combos::*;
 use indicatif::{ProgressBar, ProgressStyle};
