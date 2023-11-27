@@ -1,6 +1,7 @@
 use crate::Args;
 use crate::GitError;
-use std::process::Command;
+use crate::runner::PlatformRunner;
+
 
 pub fn commit(args: Args) -> Result<Vec<String>, GitError> {
     if let Some(msg) = args.msg {
@@ -56,10 +57,8 @@ pub fn current_branch() -> Result<String, GitError> {
     if !in_working_tree() {
         Err(GitError::NotARepo)
     } else {
-        let output = Command::new("pwsh")
-            .arg("-Command")
-            .arg("git branch --show-current")
-            .output()
+        let output = PlatformRunner::for_platform()
+            .execute("git branch --show-current")
             .expect("Failed to execute command in current_branch()");
 
         Ok(String::from_utf8_lossy(&output.stdout)
@@ -70,14 +69,8 @@ pub fn current_branch() -> Result<String, GitError> {
 }
 
 pub fn in_working_tree() -> bool {
-    let output = Command::new("pwsh")
-        .arg("-Command")
-        .arg("git rev-parse --is-inside-work-tree")
-        .output()
+    let output = PlatformRunner::for_platform()
+        .execute("git rev-parse --is-inside-work-tree")
         .expect("Failed to execute command in in_working_tree()");
-    if String::from_utf8_lossy(&output.stdout).as_ref().trim() == "true" {
-        true
-    } else {
-        false
-    }
+    String::from_utf8_lossy(&output.stdout).as_ref().trim() == "true"
 }
