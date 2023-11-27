@@ -43,18 +43,12 @@ fn main() -> Result<(), anyhow::Error> {
     let combo = get_combo(args)?;
     //let prog_bar = ProgressBar::new(sequence.len() as u64)
     //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
-    for cmd in combo.into_iter() {
+    for cmd in combo {
         if !in_working_tree() {
             return Err(GitError::NotARepo.into());
         }
         println!("\nRunning {}", cmd);
         println!("-----------------------------------------------");
-      
-        let output = Command::new("pwsh")
-            .arg("-Command")
-            .arg(&cmd)
-            .output()
-            .expect(format!("Failed to execute command in main {}", cmd).as_str());
         let output = PlatformRunner::for_platform()
             .execute(&cmd)
             .unwrap_or_else(|_| panic!("Failed to execute command in main {}", cmd));
