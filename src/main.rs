@@ -50,11 +50,6 @@ fn main() -> Result<(), anyhow::Error> {
         println!("\nRunning {}", cmd);
         println!("-----------------------------------------------");
       
-        let output = Command::new("pwsh")
-            .arg("-Command")
-            .arg(&cmd)
-            .output()
-            .expect(format!("Failed to execute command in main {}", cmd).as_str());
         let output = PlatformRunner::for_platform()
             .execute(&cmd)
             .unwrap_or_else(|_| panic!("Failed to execute command in main {}", cmd));
