@@ -1,10 +1,13 @@
 mod commands;
 mod tests;
+mod runner;
 use clap::Parser;
 use commands::combos::*;
-use indicatif::{ProgressBar, ProgressStyle};
+
 use std::io::{self, Write};
-use std::process::{Command, Termination};
+
+
+use crate::runner::PlatformRunner;
 //TODO: GOAL: add more combos, logging, tests,
 //TODO: NEXT: add support for other os/shells, refine pretty print
 //TODO: add CI between github and crates, deploy downloadable binaries
@@ -40,26 +43,19 @@ fn main() -> Result<(), anyhow::Error> {
     let combo = get_combo(args)?;
     //let prog_bar = ProgressBar::new(sequence.len() as u64)
     //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
-    for cmd in combo {
+    for cmd in combo.into_iter() {
         if !in_working_tree() {
             return Err(GitError::NotARepo.into());
         }
         println!("\nRunning {}", cmd);
         println!("-----------------------------------------------");
-        let output = Command::new("pwsh")
-            .arg("-Command")
-            .arg(cmd.clone())
-            .output()
-            .expect(format!("Failed to execute command in main {}", cmd).as_str());
+      
+        let output = PlatformRunner::for_platform()
+            .execute(&cmd)
+            .unwrap_or_else(|_| panic!("Failed to execute command in main {}", cmd));
 
-        if output.status.success() {
-            //prog_bar.inc(1);
-            io::stdout().write_all(&output.stdout).unwrap();
-            io::stderr().write_all(&output.stderr).unwrap();
-        } else {
-            io::stdout().write_all(&output.stdout).unwrap();
-            io::stderr().write_all(&output.stderr).unwrap();
-        }
+        io::stdout().write_all(&output.stdout).unwrap();
+        io::stderr().write_all(&output.stderr).unwrap();
         io::stdout().flush().unwrap();
     }
     //prog_bar.finish_with_message("Done");
