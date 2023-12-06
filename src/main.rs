@@ -1,11 +1,10 @@
 mod commands;
-mod tests;
 mod runner;
+mod tests;
 use clap::Parser;
 use commands::combos::*;
 
 use std::io::{self, Write};
-
 
 use crate::runner::PlatformRunner;
 //TODO: GOAL: add more combos, logging, tests,
@@ -49,7 +48,7 @@ fn main() -> Result<(), anyhow::Error> {
         }
         println!("\nRunning {}", cmd);
         println!("-----------------------------------------------");
-      
+
         let output = PlatformRunner::for_platform()
             .execute(&cmd)
             .unwrap_or_else(|_| panic!("Failed to execute command in main {}", cmd));
