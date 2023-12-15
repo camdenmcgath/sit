@@ -1,7 +1,6 @@
+use crate::runner::PlatformRunner;
 use crate::Args;
 use crate::GitError;
-use crate::runner::PlatformRunner;
-
 
 pub fn commit(args: Args) -> Result<Vec<String>, GitError> {
     if let Some(msg) = args.msg {
@@ -68,9 +67,14 @@ pub fn current_branch() -> Result<String, GitError> {
     }
 }
 
+// need to check the git rev-parse function
 pub fn in_working_tree() -> bool {
     let output = PlatformRunner::for_platform()
         .execute("git rev-parse --is-inside-work-tree")
-        .expect("Failed to execute command in in_working_tree()");
+        .expect("Failed to execute command in in_working_tree");
+    println!(
+        "{}",
+        String::from_utf8_lossy(&output.stdout).as_ref().trim()
+    );
     String::from_utf8_lossy(&output.stdout).as_ref().trim() == "true"
 }
