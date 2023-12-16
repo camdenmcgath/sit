@@ -28,7 +28,6 @@ impl PlatformRunner {
     // &String, String, or &str
     pub fn execute<T: AsRef<str>>(&self, cmd: T) -> std::io::Result<Output> {
         let mut runner = Command::new(self.executable);
-        println!("Running in {}", self.executable);
         for o in self.optional_args {
             runner.arg(o);
         }

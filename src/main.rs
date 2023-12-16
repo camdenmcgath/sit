@@ -40,9 +40,6 @@ pub enum GitError {
 fn main() -> Result<(), anyhow::Error> {
     let args = Args::parse();
     let combo = get_combo(args)?;
-    println!("testing from local branch");
-    //let prog_bar = ProgressBar::new(sequence.len() as u64)
-    //.with_style(ProgressStyle::with_template("{bar}  {pos}/{len} \n{msg}").unwrap());
     for cmd in combo.into_iter() {
         if !in_working_tree() {
             return Err(GitError::NotARepo.into());
