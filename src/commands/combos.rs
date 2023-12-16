@@ -72,9 +72,5 @@ pub fn in_working_tree() -> bool {
     let output = PlatformRunner::for_platform()
         .execute("git rev-parse --is-inside-work-tree")
         .expect("Failed to execute command in in_working_tree");
-    println!(
-        "{}",
-        String::from_utf8_lossy(&output.stdout).as_ref().trim()
-    );
     String::from_utf8_lossy(&output.stdout).as_ref().trim() == "true"
 }
